@@ -1,0 +1,65 @@
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+
+# Load processed solar dataset
+DATA_PATH = "../data/processed/solar_processed.csv"
+OUTPUT_CSV = "../reports/energy_estimation.csv"
+OUTPUT_PLOT = "../reports/energy_profile.png"
+
+def simulate_energy(panel_efficiency=0.18, panel_area=1.6, num_panels=10):
+    """
+    Estimate annual energy generation for selected placements.
+    - panel_efficiency: PV efficiency (18% default).
+    - panel_area: Area per panel in m^2 (standard ~1.6 m^2).
+    - num_panels: Total number of panels to simulate.
+    """
+
+    # Load solar data
+    df = pd.read_csv(DATA_PATH, parse_dates=["time"])
+
+    # Use GHI (Global Horizontal Irradiance) if available, else ninja_pv as proxy
+    if "GHI" in df.columns and df["GHI"].notna().any():
+        irradiance = df["GHI"].fillna(0)
+    else:
+        irradiance = df["ninja_pv"].fillna(0) * 1000  # scale proxy
+
+    # Power output (W) = Irradiance (W/m²) × Area × Efficiency × Num_panels
+    df["power_W"] = irradiance * panel_area * panel_efficiency * num_panels
+
+    # Energy (kWh) = Power (W) × 1h / 1000
+    df["energy_kWh"] = df["power_W"] / 1000
+
+    # Summaries
+    total_energy = df["energy_kWh"].sum()
+    avg_daily_energy = df.groupby(df["time"].dt.date)["energy_kWh"].sum().mean()
+
+    # Save results
+    results = pd.DataFrame({
+        "Total Annual Energy (kWh)": [total_energy],
+        "Average Daily Energy (kWh)": [avg_daily_energy],
+        "Number of Panels": [num_panels],
+        "Panel Efficiency": [panel_efficiency],
+        "Panel Area (m2)": [panel_area]
+    })
+    results.to_csv(OUTPUT_CSV, index=False)
+
+    # Plot energy profile
+    plt.figure(figsize=(10,5))
+    df.set_index("time")["energy_kWh"].resample("D").sum().plot()
+    plt.title("Daily Energy Generation Profile")
+    plt.ylabel("Energy (kWh)")
+    plt.xlabel("Date")
+    plt.grid(True)
+    plt.savefig(OUTPUT_PLOT, dpi=300)
+    plt.close()
+
+    print(f"✅ Energy simulation complete!")
+    print(f"   Total Energy: {total_energy:.2f} kWh/year")
+    print(f"   Average Daily: {avg_daily_energy:.2f} kWh/day")
+    print(f"   Results saved to {OUTPUT_CSV}")
+    print(f"   Plot saved to {OUTPUT_PLOT}")
+
+
+if __name__ == "__main__":
+    simulate_energy(panel_efficiency=0.18, panel_area=1.6, num_panels=20)
