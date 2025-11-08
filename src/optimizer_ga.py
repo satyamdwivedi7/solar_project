@@ -27,6 +27,7 @@ Outputs:
 """
 
 import os
+import sys
 import math
 import random
 import time
@@ -35,6 +36,19 @@ import pandas as pd
 import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
+
+# Setup absolute paths
+SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+PROJECT_ROOT = os.path.dirname(SCRIPT_DIR)
+DATA_PROCESSED = os.path.join(PROJECT_ROOT, 'data', 'processed')
+REPORTS_DIR = os.path.join(PROJECT_ROOT, 'reports')
+
+# Ensure directories exist
+os.makedirs(REPORTS_DIR, exist_ok=True)
+
+# Add src directory to path for imports
+if SCRIPT_DIR not in sys.path:
+    sys.path.insert(0, SCRIPT_DIR)
 
 # Import the simulation helpers from your hybrid script.
 # Make sure hybrid_storage_simulation.py exists in src/ and defines:
@@ -86,11 +100,11 @@ ELECTROLYZER_EFF = 0.65
 FUELCELL_EFF = 0.52
 
 # PV input file
-PV_INPUT_PATH = "../data/processed/pvlib_results.csv"
+PV_INPUT_PATH = os.path.join(DATA_PROCESSED, "pvlib_results.csv")
 
 # Output paths
-REPORT_CSV = "../reports/optimization_ga_results.csv"
-PLOT_CONVERGENCE = "../reports/optimizer_convergence.png"
+REPORT_CSV = os.path.join(REPORTS_DIR, "optimization_ga_results.csv")
+PLOT_CONVERGENCE = os.path.join(REPORTS_DIR, "optimizer_convergence.png")
 
 # Random seed
 RANDOM_SEED = 42
@@ -98,10 +112,6 @@ random.seed(RANDOM_SEED)
 np.random.seed(RANDOM_SEED)
 
 # ---- Utility functions ----
-def ensure_reports_dir():
-    reports_dir = os.path.normpath(os.path.join(os.pardir, "reports"))
-    os.makedirs(reports_dir, exist_ok=True)
-
 def crf(rate, n):
     if rate == 0:
         return 1.0/n
@@ -230,8 +240,6 @@ def tournament_selection(pop, scores, k=TOURNAMENT_SIZE):
 
 # ---- Main GA loop ----
 def run_ga():
-    ensure_reports_dir()
-
     # load PV series and create load
     pv_kw = read_pv_series(PV_INPUT_PATH)
     load_arr = generate_synthetic_load(pv_kw.index, base_kwh=10.0, peak_kwh=25.0)

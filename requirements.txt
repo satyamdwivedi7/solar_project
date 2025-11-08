@@ -1,11 +1,46 @@
-numpy
-pandas
-scikit-learn
-matplotlib
-pvlib
-deap
-gym
-stable-baselines3
-torch
-joblib
-pyomo       # optional if using Pyomo
+# Core dependencies
+numpy==1.26.3
+pandas==2.2.0
+matplotlib==3.8.2
+seaborn==0.13.2
+scipy==1.11.4
+
+# Solar simulation
+pvlib==0.10.2
+
+# Machine Learning - Traditional
+scikit-learn==1.6.1
+xgboost==2.0.3
+lightgbm==4.3.0
+
+# Time Series Forecasting
+prophet==1.1.5
+statsmodels==0.14.1
+
+# Deep Learning
+tensorflow==2.15.0
+keras==2.15.0
+torch==2.1.2
+torchvision==0.16.2
+
+# Optimization Algorithms
+deap==1.4.1
+pymoo==0.6.1.5
+pyswarm==0.6
+
+# Reinforcement Learning
+gym==0.26.2
+stable-baselines3==2.2.1
+
+# Utilities
+joblib==1.3.2
+tqdm==4.66.1
+pyyaml==6.0.1
+python-dotenv==1.0.0
+plotly==5.18.0
+
+# Optional
+kaggle==1.5.16
+pyomo  # For advanced optimization
+openpyxl==3.1.2
+

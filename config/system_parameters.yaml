@@ -1,0 +1,94 @@
+# System Configuration Parameters
+# Location: Dehradun, India
+
+location:
+  latitude: 13.0837
+  longitude: 80.2702
+  timezone: 'Asia/Kolkata'
+  altitude: 640  # meters
+
+solar_pv:
+  panel_type: 'Monocrystalline'
+  efficiency_min: 0.18
+  efficiency_max: 0.22
+  efficiency_nominal: 0.20
+  system_size_min: 5.0  # kW
+  system_size_max: 50.0  # kW
+  tilt_angle_min: 0  # degrees
+  tilt_angle_max: 60  # degrees
+  azimuth_angle: 180  # South facing (optimal for Northern hemisphere)
+  panel_area: 1.6  # m² per panel
+  temperature_coefficient: -0.004  # per °C
+  degradation_rate: 0.007  # 0.7% per year
+
+battery_storage:
+  technology: 'Lithium-ion'
+  capacity_min: 10.0  # kWh
+  capacity_max: 100.0  # kWh
+  depth_of_discharge: 0.80
+  roundtrip_efficiency: 0.90
+  cycle_life_min: 5000
+  cycle_life_max: 8000
+  cost_per_kwh: 12000  # ₹/kWh (will be optimized by ML)
+  self_discharge_rate: 0.0003  # per hour
+  charge_rate_max: 0.5  # C-rate
+  discharge_rate_max: 1.0  # C-rate
+
+hydrogen_storage:
+  electrolyzer_type: 'PEM'  # Proton Exchange Membrane
+  electrolyzer_efficiency: 0.70
+  tank_capacity_min: 5.0  # kg H2
+  tank_capacity_max: 50.0  # kg H2
+  fuel_cell_efficiency: 0.55
+  storage_pressure: 700  # bar
+  h2_energy_density: 33.33  # kWh/kg
+  cost_per_kg_capacity: 50000  # ₹/kg capacity
+  electrolyzer_cost_per_kw: 80000  # ₹/kW
+  fuel_cell_cost_per_kw: 100000  # ₹/kW
+  
+  # Safety parameters
+  safety_distance_min: 15  # meters from buildings
+  explosion_risk_threshold: 0.01  # 1% maximum acceptable risk
+  max_pressure: 750  # bar (safety margin)
+  max_temperature: 85  # °C
+  leak_detection_response_time: 5  # seconds
+  emergency_shutdown_time: 10  # seconds
+  mandatory_inspection_days: 90
+  ventilation_requirement: 'forced'  # continuous forced ventilation
+
+load_profile:
+  type: 'Residential'
+  average_daily_consumption: 30  # kWh/day
+  min_daily_consumption: 20  # kWh/day
+  max_daily_consumption: 40  # kWh/day
+  peak_load: 8  # kW
+  seasonal_variability: 0.25  # 25% variation
+  
+optimization:
+  objectives:
+    - name: 'maximize_energy'
+      weight: 0.4
+      target: 800  # kWh/year minimum
+    - name: 'minimize_cost'
+      weight: 0.4
+      target: 'optimal'  # ML-driven
+    - name: 'minimize_safety_risk'
+      weight: 0.2
+      target: 0.001  # 0.1% risk maximum
+  
+  constraints:
+    min_energy_yield: 700  # kWh/year
+    max_energy_yield: 1000  # kWh/year
+    max_total_cost: 5000000  # ₹5 million
+    max_explosion_risk: 0.01
+    min_battery_soc: 0.20
+    max_grid_export: 10  # kW
+    energy_balance_requirement: 0.95  # 95% self-sufficiency
+    
+financial:
+  electricity_tariff: 8.0  # ₹/kWh
+  grid_export_tariff: 5.0  # ₹/kWh
+  discount_rate: 0.08
+  project_lifetime: 25  # years
+  maintenance_cost_annual_pct: 0.02  # 2% of CAPEX
+  insurance_cost_annual: 50000  # ₹/year

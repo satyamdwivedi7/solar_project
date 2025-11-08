@@ -1,2 +1,76 @@
-data/
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+*.egg
+*.egg-info/
+dist/
+build/
+*.pkl
+*.joblib
+
+# Virtual Environment
 .venv/
+venv/
+ENV/
+env/
+
+# Jupyter Notebook
+.ipynb_checkpoints/
+*.ipynb_checkpoints
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Data files (large datasets)
+data/raw/*.csv
+data/processed/*.csv
+!data/processed/master_dataset.csv
+data/processed/splits/*.csv
+
+# Keep directory structure
+!data/raw/.gitkeep
+!data/processed/.gitkeep
+!data/processed/splits/.gitkeep
+
+# Reports (generated outputs)
+reports/*.png
+reports/*.csv
+!reports/optimization_results.csv
+!reports/model_performance.csv
+
+# Models (large files)
+models/*.pkl
+models/*.h5
+models/*.pt
+models/*.pth
+
+# Temporary files
+*.tmp
+*.bak
+*.log
+*.cache
+
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Project specific
+*.md
+!README.md
+OPTIMIZATION_SUCCESS.txt
+QUICK_REFERENCE.txt
+*.sh
+create_*.py
+generate_*.py
+prepare_*.py
+
+# Colab temporary files
+*_COLAB.py

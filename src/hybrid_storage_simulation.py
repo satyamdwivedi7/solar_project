@@ -14,6 +14,15 @@ import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 
+# Setup absolute paths
+SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+PROJECT_ROOT = os.path.dirname(SCRIPT_DIR)
+DATA_PROCESSED = os.path.join(PROJECT_ROOT, 'data', 'processed')
+REPORTS_DIR = os.path.join(PROJECT_ROOT, 'reports')
+
+# Ensure directories exist
+os.makedirs(REPORTS_DIR, exist_ok=True)
+
 # ---- Configurable system parameters ----
 BATTERY_CAPACITY_KWH = 50.0        # kWh (installed battery energy capacity)
 BATTERY_SOC_INIT = 0.2 * BATTERY_CAPACITY_KWH  # initial SOC (kWh)
@@ -31,21 +40,15 @@ FUELCELL_EFF = 0.52                # fraction (kWh H2 energy -> kWh electric)
 H2_SAFETY_BUFFER = 0.05            # fraction of tank reserved (do not fill beyond 1 - buffer)
 
 # Simulation settings
-PV_INPUT_PATH = "../data/processed/pvlib_results.csv"
-OUTPUT_CSV = "../reports/hybrid_results.csv"
-PLOT_PROFILE = "../reports/hybrid_profile.png"
-PLOT_SUMMARY = "../reports/hybrid_storage_summary.png"
+PV_INPUT_PATH = os.path.join(DATA_PROCESSED, "pvlib_results.csv")
+OUTPUT_CSV = os.path.join(REPORTS_DIR, "hybrid_results.csv")
+PLOT_PROFILE = os.path.join(REPORTS_DIR, "hybrid_profile.png")
+PLOT_SUMMARY = os.path.join(REPORTS_DIR, "hybrid_storage_summary.png")
 
 RANDOM_SEED = 42
 np.random.seed(RANDOM_SEED)
 
 # ---- Utility functions ----
-def ensure_reports_dir():
-    reports_dir = os.path.join(os.pardir, "reports")
-    reports_dir = os.path.normpath(reports_dir)
-    if not os.path.exists(reports_dir):
-        os.makedirs(reports_dir, exist_ok=True)
-
 def read_pv_series(path):
     # Read pvlib results - try to detect the AC column.
     df = pd.read_csv(path, parse_dates=True, index_col=0)
@@ -273,7 +276,6 @@ def simulate_hybrid(pv_kw, load_kw,
 
 # ---- Main execution ----
 def main():
-    ensure_reports_dir()
     # Load PV series
     if not os.path.exists(PV_INPUT_PATH):
         raise FileNotFoundError(f"PV input not found at {PV_INPUT_PATH}")

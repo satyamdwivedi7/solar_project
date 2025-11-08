@@ -1,11 +1,21 @@
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
+import os
+
+# Setup absolute paths
+SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+PROJECT_ROOT = os.path.dirname(SCRIPT_DIR)
+DATA_PROCESSED = os.path.join(PROJECT_ROOT, 'data', 'processed')
+REPORTS_DIR = os.path.join(PROJECT_ROOT, 'reports')
+
+# Ensure directories exist
+os.makedirs(REPORTS_DIR, exist_ok=True)
 
 # Load processed solar dataset
-DATA_PATH = "../data/processed/solar_processed.csv"
-OUTPUT_CSV = "../reports/energy_estimation.csv"
-OUTPUT_PLOT = "../reports/energy_profile.png"
+DATA_PATH = os.path.join(DATA_PROCESSED, "solar_processed.csv")
+OUTPUT_CSV = os.path.join(REPORTS_DIR, "energy_estimation.csv")
+OUTPUT_PLOT = os.path.join(REPORTS_DIR, "energy_profile.png")
 
 def simulate_energy(panel_efficiency=0.18, panel_area=1.6, num_panels=10):
     """

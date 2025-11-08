@@ -1,6 +1,16 @@
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
+import os
+
+# Setup absolute paths
+SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+PROJECT_ROOT = os.path.dirname(SCRIPT_DIR)
+DATA_PROCESSED = os.path.join(PROJECT_ROOT, 'data', 'processed')
+REPORTS_DIR = os.path.join(PROJECT_ROOT, 'reports')
+
+# Ensure directories exist
+os.makedirs(REPORTS_DIR, exist_ok=True)
 
 # Parameters (can be tuned)
 ELECTROLYZER_EFF = 0.7       # 70% efficiency
@@ -74,7 +84,8 @@ def simulate_hydrogen(df):
 
 def main():
     # Load processed solar dataset
-    df = pd.read_csv("../data/processed/solar_processed.csv", parse_dates=["time"], index_col="time")
+    data_path = os.path.join(DATA_PROCESSED, "solar_processed.csv")
+    df = pd.read_csv(data_path, parse_dates=["time"], index_col="time")
 
     # Generate synthetic load
     df["load"] = generate_synthetic_load(df)
@@ -86,7 +97,8 @@ def main():
     df = simulate_hydrogen(df)
 
     # Save results
-    df.to_csv("../reports/hydrogen_results.csv")
+    results_path = os.path.join(REPORTS_DIR, "hydrogen_results.csv")
+    df.to_csv(results_path)
 
     # Plot
     plt.figure(figsize=(12,6))
@@ -98,7 +110,8 @@ def main():
     plt.ylabel("Energy (kWh)")
     plt.legend()
     plt.tight_layout()
-    plt.savefig("../reports/hydrogen_profile.png", dpi=300)
+    plot_path = os.path.join(REPORTS_DIR, "hydrogen_profile.png")
+    plt.savefig(plot_path, dpi=300)
     plt.close()
 
     print("✅ Hydrogen simulation complete!")
@@ -106,8 +119,8 @@ def main():
     print(f"   Annual PV Generation: {df['PV_Generation'].sum():.2f} kWh")
     print(f"   Annual Load: {df['load'].sum():.2f} kWh")
     print(f"   Max H2 Storage Used: {df['H2_Storage'].max():.2f} kWh")
-    print("   Results saved to ../reports/hydrogen_results.csv")
-    print("   Plot saved to ../reports/hydrogen_profile.png")
+    print(f"   Results saved to {results_path}")
+    print(f"   Plot saved to {plot_path}")
 
 if __name__ == "__main__":
     main()

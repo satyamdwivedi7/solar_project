@@ -60,14 +60,3 @@ for pos in best_positions:
     print(tuple(pos))
 
 # Visualization
-plt.figure(figsize=(8,6))
-plt.imshow(energy_matrix, cmap="viridis", origin="lower")
-plt.colorbar(label="Relative Energy Output (kWh)")
-plt.scatter(best_positions[:,1], best_positions[:,0], c="red", marker="x", label="Best")
-plt.title("Optimal Panel Placement Grid")
-plt.xlabel("Column")
-plt.ylabel("Row")
-plt.legend()
-plot_path = os.path.join(REPORTS_DIR, "panel_placement.png")
-plt.savefig(plot_path, dpi=300)
-plt.show()

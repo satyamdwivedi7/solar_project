@@ -1,0 +1,98 @@
+# Machine Learning Hyperparameters
+
+solar_forecasting:
+  prophet:
+    seasonality_mode: 'additive'
+    yearly_seasonality: true
+    weekly_seasonality: true
+    daily_seasonality: false
+    changepoint_prior_scale: 0.5
+    seasonality_prior_scale: 10.0
+    
+  lstm:
+    sequence_length: 168  # 7 days of hourly data
+    hidden_units: [128, 64, 32]
+    dropout: 0.2
+    learning_rate: 0.001
+    batch_size: 32
+    epochs: 100
+    validation_split: 0.2
+    
+  xgboost:
+    n_estimators: 500
+    max_depth: 7
+    learning_rate: 0.05
+    subsample: 0.8
+    colsample_bytree: 0.8
+    min_child_weight: 3
+    
+  random_forest:
+    n_estimators: 300
+    max_depth: 15
+    min_samples_split: 5
+    min_samples_leaf: 2
+    
+load_forecasting:
+  arima:
+    order: [2, 1, 2]  # (p, d, q)
+    seasonal_order: [1, 1, 1, 24]  # (P, D, Q, s)
+    
+  neural_network:
+    layers: [64, 32, 16]
+    activation: 'relu'
+    dropout: 0.3
+    learning_rate: 0.001
+    epochs: 80
+    batch_size: 64
+
+optimization:
+  genetic_algorithm:
+    population_size: 100
+    generations: 200
+    crossover_probability: 0.8
+    mutation_probability: 0.2
+    tournament_size: 5
+    elitism: 0.1
+    
+  particle_swarm:
+    n_particles: 50
+    max_iterations: 150
+    w: 0.7  # inertia weight
+    c1: 1.5  # cognitive parameter
+    c2: 1.5  # social parameter
+    
+  nsga2:
+    population_size: 100
+    generations: 200
+    crossover_eta: 20
+    mutation_eta: 20
+    
+  reinforcement_learning:
+    dqn:
+      learning_rate: 0.0001
+      gamma: 0.99  # discount factor
+      epsilon_start: 1.0
+      epsilon_end: 0.01
+      epsilon_decay: 0.995
+      memory_size: 10000
+      batch_size: 64
+      target_update: 10
+      hidden_layers: [256, 128, 64]
+      
+training:
+  test_size: 0.2
+  validation_size: 0.2
+  random_state: 42
+  cv_folds: 5
+  early_stopping_patience: 10
+  
+metrics:
+  regression:
+    - 'mae'
+    - 'rmse'
+    - 'mape'
+    - 'r2'
+  optimization:
+    - 'hypervolume'
+    - 'spacing'
+    - 'convergence'

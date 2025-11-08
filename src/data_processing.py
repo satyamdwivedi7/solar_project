@@ -1,15 +1,21 @@
 import pandas as pd
 import os
+import sys
 from pvlib_simulation import load_and_simulate_pvlib
 
-RAW_DIR = "../data/raw"
-PROCESSED_DIR = "../data/processed"
-os.makedirs(PROCESSED_DIR, exist_ok=True)
+# Setup absolute paths
+SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+PROJECT_ROOT = os.path.dirname(SCRIPT_DIR)
+DATA_RAW = os.path.join(PROJECT_ROOT, 'data', 'raw')
+DATA_PROCESSED = os.path.join(PROJECT_ROOT, 'data', 'processed')
+
+# Ensure directories exist
+os.makedirs(DATA_PROCESSED, exist_ok=True)
 
 
 def load_pvlib_data():
     """Load already generated PVLib simulation results"""
-    pvlib_path = os.path.join(PROCESSED_DIR, "pvlib_results.csv")
+    pvlib_path = os.path.join(DATA_PROCESSED, "pvlib_results.csv")
     
     if os.path.exists(pvlib_path):
         print(f"📂 Loading existing PVLib results from {pvlib_path}")
@@ -27,7 +33,7 @@ def load_pvlib_data():
             df.rename(columns={"index": "time"}, inplace=True)
             
             # Save results
-            pvlib_path = os.path.join(PROCESSED_DIR, "pvlib_results.csv")
+            pvlib_path = os.path.join(DATA_PROCESSED, "pvlib_results.csv")
             df.to_csv(pvlib_path, index=False)
             
             print(f"✅ PVLib simulation complete - {len(df)} records")
@@ -38,7 +44,7 @@ def load_pvlib_data():
 
 
 def load_nsrdb():
-    path = "../data/raw/nsrdb.csv"
+    path = os.path.join(DATA_RAW, "nsrdb.csv")
     print(f"Loading NSRDB file: {path}")
 
     df = pd.read_csv(path, skiprows=2)  # Skip the 2 header rows before actual data
@@ -102,7 +108,7 @@ def merge_all():
         print("❌ No data available for processing")
         return
     
-    outpath = os.path.join(PROCESSED_DIR, "solar_processed.csv")
+    outpath = os.path.join(DATA_PROCESSED, "solar_processed.csv")
     df.to_csv(outpath, index=False)
     print("✅ Processed dataset saved to:", outpath)
     print(f"   Total records: {len(df)}")

@@ -5,6 +5,19 @@ from pvlib.pvsystem import PVSystem
 from pvlib.modelchain import ModelChain
 from pvlib.location import Location
 from pvlib.temperature import TEMPERATURE_MODEL_PARAMETERS
+import os
+import sys
+
+# Get absolute paths
+SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+PROJECT_ROOT = os.path.dirname(SCRIPT_DIR)
+DATA_RAW = os.path.join(PROJECT_ROOT, 'data', 'raw')
+DATA_PROCESSED = os.path.join(PROJECT_ROOT, 'data', 'processed')
+REPORTS_DIR = os.path.join(PROJECT_ROOT, 'reports')
+
+# Create directories if they don't exist
+os.makedirs(DATA_PROCESSED, exist_ok=True)
+os.makedirs(REPORTS_DIR, exist_ok=True)
 
 
 def load_and_simulate_pvlib(tilt_angle=20, azimuth_angle=180, num_panels=10):
@@ -21,7 +34,8 @@ def load_and_simulate_pvlib(tilt_angle=20, azimuth_angle=180, num_panels=10):
     """
     
     # Load NSRDB data (skip first 2 metadata rows)
-    df = pd.read_csv("../data/raw/nsrdb.csv", skiprows=2)
+    nsrdb_path = os.path.join(DATA_RAW, 'nsrdb.csv')
+    df = pd.read_csv(nsrdb_path, skiprows=2)
     
     # Build datetime index
     df["time"] = pd.to_datetime(df[["Year", "Month", "Day", "Hour", "Minute"]])
@@ -111,12 +125,14 @@ if __name__ == "__main__":
             if annual_energy > best_energy:
                 best_energy = annual_energy
                 best_angle = tilt
-            # Save each tilt’s detailed output if needed
-            results.to_csv(f"../data/processed/pvlib_results_tilt{tilt}.csv")
+            # Save each tilt's detailed output if needed
+            output_path = os.path.join(DATA_PROCESSED, f'pvlib_results_tilt{tilt}.csv')
+            results.to_csv(output_path)
     
     # Save summary CSV
     summary_df = pd.DataFrame(results_summary, columns=["Tilt Angle (°)", "Annual Energy (kWh)"])
-    summary_df.to_csv("../reports/tilt_analysis.csv", index=False)
+    summary_path = os.path.join(REPORTS_DIR, 'tilt_analysis.csv')
+    summary_df.to_csv(summary_path, index=False)
     
     # Plot tilt vs energy
     plt.figure(figsize=(8, 6))
@@ -125,7 +141,8 @@ if __name__ == "__main__":
     plt.xlabel("Tilt Angle (°)")
     plt.ylabel("Annual Energy (kWh)")
     plt.grid(True)
-    plt.savefig("../reports/tilt_vs_energy.png", dpi=300)
+    plot_path = os.path.join(REPORTS_DIR, 'tilt_vs_energy.png')
+    plt.savefig(plot_path, dpi=300)
     plt.show()
     
     print(f"\n🌞 Best tilt angle: {best_angle}° with {best_energy:.2f} kWh annual energy")
