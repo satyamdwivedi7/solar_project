@@ -20,10 +20,10 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 # Configuration
 LOCATION = {
-    'name': 'Dehradun, Uttarakhand, India',
-    'latitude': 30.3165,
-    'longitude': 78.0322,
-    'altitude': 640  # meters
+    'name': 'Chennai, Tamil Nadu, India',
+    'latitude': 13.05,
+    'longitude': 80.25,
+    'altitude': 16  # meters (coastal elevation)
 }
 
 # System parameters

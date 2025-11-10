@@ -44,10 +44,29 @@ def load_pvlib_data():
 
 
 def load_nsrdb():
-    path = os.path.join(DATA_RAW, "nsrdb.csv")
-    print(f"Loading NSRDB file: {path}")
-
-    df = pd.read_csv(path, skiprows=2)  # Skip the 2 header rows before actual data
+    """
+    Load NSRDB solar data - supports both multi-year files and single file
+    Returns: pandas DataFrame with datetime and weather columns
+    """
+    # Check for multi-year files first (nsrdb_2010.csv, nsrdb_2011.csv, etc.)
+    multi_year_files = sorted([f for f in os.listdir(DATA_RAW) if f.startswith('nsrdb_') and f.endswith('.csv')])
+    
+    if multi_year_files:
+        print(f"📁 Loading {len(multi_year_files)} NSRDB year files...")
+        dfs = []
+        for file in multi_year_files:
+            file_path = os.path.join(DATA_RAW, file)
+            year_df = pd.read_csv(file_path, skiprows=2)
+            dfs.append(year_df)
+            print(f"   ✓ Loaded {file} ({len(year_df)} records)")
+        
+        df = pd.concat(dfs, ignore_index=True)
+        print(f"✅ Combined {len(df)} total records from {len(multi_year_files)} years")
+    else:
+        # Fallback to single file if multi-year files not found
+        path = os.path.join(DATA_RAW, "nsrdb.csv")
+        print(f"Loading NSRDB file: {path}")
+        df = pd.read_csv(path, skiprows=2)  # Skip the 2 header rows before actual data
 
     # Create datetime column (timezone-naive to match PVLib)
     df["time"] = pd.to_datetime(

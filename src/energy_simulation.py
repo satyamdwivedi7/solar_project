@@ -26,8 +26,12 @@ def simulate_energy(panel_efficiency=0.18, panel_area=1.6, num_panels=10):
     """
 
     # Load solar data with pvlib results
-    df = pd.read_csv(DATA_PATH, parse_dates=["time"])
-
+    df = pd.read_csv(DATA_PATH)
+    
+    # Ensure time column is datetime
+    if "time" in df.columns:
+        df["time"] = pd.to_datetime(df["time"])
+    
     # Use energy_kwh from pvlib simulation (already calculated with proper physics models)
     if "energy_kwh" in df.columns:
         # Scale the energy based on number of panels (pvlib was run with 10 panels)

@@ -85,8 +85,22 @@ def generate_realistic_synthetic_solar():
     """
     print("🔧 Generating realistic synthetic solar power data...")
     
-    # Load existing NSRDB data as baseline
-    nsrdb = pd.read_csv("../data/raw/nsrdb.csv", skiprows=2)
+    # Load existing NSRDB data as baseline - supports multi-year files
+    raw_dir = "../data/raw/"
+    multi_year_files = sorted([f for f in os.listdir(raw_dir) if f.startswith('nsrdb_') and f.endswith('.csv')])
+    
+    if multi_year_files:
+        print(f"📁 Loading {len(multi_year_files)} NSRDB year files...")
+        dfs = []
+        for file in multi_year_files:
+            file_path = os.path.join(raw_dir, file)
+            year_df = pd.read_csv(file_path, skiprows=2)
+            dfs.append(year_df)
+        nsrdb = pd.concat(dfs, ignore_index=True)
+        print(f"✅ Combined {len(nsrdb)} records")
+    else:
+        # Fallback to single file
+        nsrdb = pd.read_csv("../data/raw/nsrdb.csv", skiprows=2)
     
     # Create datetime
     nsrdb['time'] = pd.to_datetime(

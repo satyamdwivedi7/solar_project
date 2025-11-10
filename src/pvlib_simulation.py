@@ -33,9 +33,22 @@ def load_and_simulate_pvlib(tilt_angle=20, azimuth_angle=180, num_panels=10):
     - DataFrame with simulation results
     """
     
-    # Load NSRDB data (skip first 2 metadata rows)
-    nsrdb_path = os.path.join(DATA_RAW, 'nsrdb.csv')
-    df = pd.read_csv(nsrdb_path, skiprows=2)
+    # Load NSRDB data - supports multi-year files
+    multi_year_files = sorted([f for f in os.listdir(DATA_RAW) if f.startswith('nsrdb_') and f.endswith('.csv')])
+    
+    if multi_year_files:
+        print(f"📁 Loading {len(multi_year_files)} NSRDB year files for PVLib simulation...")
+        dfs = []
+        for file in multi_year_files:
+            file_path = os.path.join(DATA_RAW, file)
+            year_df = pd.read_csv(file_path, skiprows=2)
+            dfs.append(year_df)
+        df = pd.concat(dfs, ignore_index=True)
+        print(f"✅ Combined {len(df)} records from {len(multi_year_files)} years")
+    else:
+        # Fallback to single file
+        nsrdb_path = os.path.join(DATA_RAW, 'nsrdb.csv')
+        df = pd.read_csv(nsrdb_path, skiprows=2)
     
     # Build datetime index
     df["time"] = pd.to_datetime(df[["Year", "Month", "Day", "Hour", "Minute"]])
@@ -86,6 +99,7 @@ def load_and_simulate_pvlib(tilt_angle=20, azimuth_angle=180, num_panels=10):
         
         # Extract results
         results_df = pd.DataFrame(index=df.index)
+        results_df["time"] = df.index  # Keep time column
         results_df["ac_power"] = mc.results.ac.fillna(0)  # AC power output in W
         results_df["dc_power"] = mc.results.dc.fillna(0)  # DC power output in W  
         results_df["energy_kwh"] = results_df["ac_power"] / 1000  # Convert to kWh (assuming hourly data)
@@ -116,6 +130,7 @@ if __name__ == "__main__":
     # Sweep through tilt angles 0° to 60° in steps of 5°
     results_summary = []
     best_angle, best_energy = None, 0
+    best_results = None
     
     for tilt in range(0, 61, 5):
         results = load_and_simulate_pvlib(tilt_angle=tilt, azimuth_angle=180, num_panels=10)
@@ -125,9 +140,16 @@ if __name__ == "__main__":
             if annual_energy > best_energy:
                 best_energy = annual_energy
                 best_angle = tilt
+                best_results = results.copy()  # Save best results
             # Save each tilt's detailed output if needed
             output_path = os.path.join(DATA_PROCESSED, f'pvlib_results_tilt{tilt}.csv')
-            results.to_csv(output_path)
+            results.to_csv(output_path, index=False)
+    
+    # Save best tilt results as main pvlib_results.csv
+    if best_results is not None:
+        main_output = os.path.join(DATA_PROCESSED, 'pvlib_results.csv')
+        best_results.to_csv(main_output, index=False)
+        print(f"\n💾 Saved best results (tilt={best_angle}°) to: {main_output}")
     
     # Save summary CSV
     summary_df = pd.DataFrame(results_summary, columns=["Tilt Angle (°)", "Annual Energy (kWh)"])
